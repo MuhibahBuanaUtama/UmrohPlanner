@@ -1,11 +1,12 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const laSchema = new mongoose.Schema(
   {
-    count: {
+    countLa: {
       type: Number,
-      required: [true, "Jumlah (count) wajib diisi"],
+      required: [true, 'Jumlah (count) wajib diisi'],
       enum: [10, 15, 20, 30],
+      unique: [true, 'Jumlah sudah ada'],
       validate: {
         validator: function (value) {
           return [10, 15, 20, 30].includes(value);
@@ -13,10 +14,10 @@ const laSchema = new mongoose.Schema(
         message: (props) => `${props.value} adalah jumlah yang tidak valid!`,
       },
     },
-    price: {
+    laPrice: {
       type: Number,
-      required: [true, "Harga wajib diisi"],
-      min: [0, "Harga harus lebih besar dari 0"],
+      required: [true, 'Harga wajib diisi'],
+      min: [0, 'Harga harus lebih besar dari 0'],
     },
   },
   {
@@ -31,6 +32,6 @@ const laSchema = new mongoose.Schema(
   }
 );
 
-const La = mongoose.model("las", laSchema);
+const La = mongoose.model('las', laSchema);
 
 module.exports = La;

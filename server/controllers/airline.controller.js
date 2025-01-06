@@ -1,20 +1,17 @@
-const Airline = require("../models/airline.model");
+const Airline = require('../models/airline.model');
 
 const indexAirline = async (req, res) => {
   try {
     const { size = 10, current = 1 } = req.query;
     const skip = (current - 1) * size;
 
-    const [total, airlines] = await Promise.all([
-      Airline.countDocuments(),
-      Airline.find({}).skip(skip).limit(parseInt(size)),
-    ]);
+    const [total, airlines] = await Promise.all([Airline.countDocuments(), Airline.find({}).skip(skip).limit(parseInt(size))]);
 
     const totalPages = Math.ceil(total / size);
 
     res.status(200).json({
       code: 200,
-      status: "Ok",
+      status: 'Ok',
       data: airlines,
       page: {
         size: parseInt(size),
@@ -26,7 +23,7 @@ const indexAirline = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       code: 500,
-      status: "Internal Server Error",
+      status: 'Internal Server Error',
       message: error.message,
     });
   }
@@ -41,20 +38,20 @@ const showAirline = async (req, res) => {
     if (!airline) {
       return res.status(404).json({
         code: 404,
-        status: "Not Found",
-        message: "Resource not found",
+        status: 'Not Found',
+        message: 'Resource not found',
       });
     }
 
     res.status(200).json({
       code: 200,
-      status: "Ok",
+      status: 'Ok',
       data: airline,
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
-      status: "Internal Server Error",
+      status: 'Internal Server Error',
       message: error.message,
     });
   }
@@ -68,22 +65,22 @@ const storeAirline = async (req, res) => {
 
     res.status(201).json({
       code: 201,
-      status: "Created",
+      status: 'Created',
       data: airline,
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err) => err.message);
 
       res.status(400).json({
         code: 400,
-        status: "Bad Request",
-        message: errors.join(", "),
+        status: 'Bad Request',
+        message: errors.join(', '),
       });
     } else {
       res.status(500).json({
         code: 500,
-        status: "Internal Server Error",
+        status: 'Internal Server Error',
         message: error.message,
       });
     }
@@ -95,29 +92,25 @@ const updateAirline = async (req, res) => {
     const { id } = req.params;
     const airlineData = req.body;
 
-    const updatedAirline = await Airline.findByIdAndUpdate(
-      { _id: id },
-      { $set: airlineData },
-      { new: true }
-    );
+    const updatedAirline = await Airline.findByIdAndUpdate({ _id: id }, { $set: airlineData }, { new: true });
 
     if (!updatedAirline) {
       return res.status(404).json({
         code: 404,
-        status: "Not Found",
-        message: "Resource not found",
+        status: 'Not Found',
+        message: 'Resource not found',
       });
     }
 
     res.status(201).json({
       code: 201,
-      status: "Created",
+      status: 'Created',
       data: updatedAirline,
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
-      status: "Internal Server Error",
+      status: 'Internal Server Error',
       message: error.message,
     });
   }
@@ -132,19 +125,19 @@ const deleteAirline = async (req, res) => {
     if (!airline) {
       return res.status(404).json({
         code: 404,
-        status: "Not Found",
-        message: "Resource not found",
+        status: 'Not Found',
+        message: 'Resource not found',
       });
     }
 
     res.status(204).json({
       code: 204,
-      status: "No Content",
+      status: 'No Content',
     });
   } catch (error) {
     res.status(500).json({
       code: 500,
-      status: "Internal Server Error",
+      status: 'Internal Server Error',
       message: error.message,
     });
   }

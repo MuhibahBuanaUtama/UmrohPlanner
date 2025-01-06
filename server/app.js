@@ -13,7 +13,7 @@ const hotelRoute = require('./routes/hotel.route');
 const airlineRoute = require('./routes/airline.route');
 const visaRoute = require('./routes/visa.route');
 const laRoute = require('./routes/la.route');
-const serviceRoute = require('./routes/service.route');
+const settingRoute = require('./routes/setting.route');
 const calculateRoute = require('./routes/calculate.route');
 
 // middleware
@@ -25,7 +25,7 @@ app.use(`${url}/hotels`, hotelRoute);
 app.use(`${url}/airlines`, airlineRoute);
 app.use(`${url}/visas`, visaRoute);
 app.use(`${url}/las`, laRoute);
-app.use(`${url}/services`, serviceRoute);
+app.use(`${url}/settings`, settingRoute);
 app.use(`${url}/calculates`, calculateRoute);
 
 module.exports = app;

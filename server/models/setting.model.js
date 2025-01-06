@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const serviceSchema = new mongoose.Schema(
+const settingSchema = new mongoose.Schema(
   {
     usdToSar: {
       type: Number,
@@ -48,6 +48,6 @@ const serviceSchema = new mongoose.Schema(
   }
 );
 
-const Service = mongoose.model('services', serviceSchema);
+const Setting = mongoose.model('settings', settingSchema);
 
-module.exports = Service;
+module.exports = Setting;

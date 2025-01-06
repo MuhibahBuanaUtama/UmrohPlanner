@@ -1,18 +1,18 @@
-const Service = require('../models/service.model');
+const Setting = require('../models/setting.model');
 
-const indexService = async (req, res) => {
+const indexSetting = async (req, res) => {
   try {
     const { size = 10, current = 1 } = req.query;
     const skip = (current - 1) * size;
 
-    const [total, services] = await Promise.all([Service.countDocuments(), Service.find({}).skip(skip).limit(parseInt(size))]);
+    const [total, settings] = await Promise.all([Setting.countDocuments(), Setting.find({}).skip(skip).limit(parseInt(size))]);
 
     const totalPages = Math.ceil(total / size);
 
     res.status(200).json({
       code: 200,
       status: 'Ok',
-      data: services,
+      data: settings,
       page: {
         size: parseInt(size),
         total: total,
@@ -29,13 +29,13 @@ const indexService = async (req, res) => {
   }
 };
 
-const showService = async (req, res) => {
+const showSetting = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const service = await Service.findById(id).lean();
+    const setting = await Setting.findById(id).lean();
 
-    if (!service) {
+    if (!setting) {
       return res.status(404).json({
         code: 404,
         status: 'Not Found',
@@ -46,7 +46,7 @@ const showService = async (req, res) => {
     res.status(200).json({
       code: 200,
       status: 'Ok',
-      data: service,
+      data: setting,
     });
   } catch (error) {
     res.status(500).json({
@@ -57,16 +57,16 @@ const showService = async (req, res) => {
   }
 };
 
-const storeService = async (req, res) => {
+const storeSetting = async (req, res) => {
   try {
-    const serviceData = req.body;
+    const settingData = req.body;
 
-    const service = await Service.create(serviceData);
+    const setting = await Setting.create(settingData);
 
     res.status(201).json({
       code: 201,
       status: 'Created',
-      data: service,
+      data: setting,
     });
   } catch (error) {
     if (error.name === 'ValidationError') {
@@ -87,14 +87,14 @@ const storeService = async (req, res) => {
   }
 };
 
-const updateService = async (req, res) => {
+const updateSetting = async (req, res) => {
   try {
     const { id } = req.params;
-    const serviceData = req.body;
+    const settingData = req.body;
 
-    const updatedService = await Hotel.findByIdAndUpdate({ _id: id }, { $set: serviceData }, { new: true });
+    const updatedSetting = await Setting.findByIdAndUpdate({ _id: id }, { $set: settingData }, { new: true });
 
-    if (!updatedService) {
+    if (!updatedSetting) {
       return res.status(404).json({
         code: 404,
         status: 'Not Found',
@@ -105,7 +105,7 @@ const updateService = async (req, res) => {
     res.status(201).json({
       code: 201,
       status: 'Created',
-      data: updatedService,
+      data: updatedSetting,
     });
   } catch (error) {
     res.status(500).json({
@@ -116,13 +116,13 @@ const updateService = async (req, res) => {
   }
 };
 
-const deleteService = async (req, res) => {
+const deleteSetting = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const service = await Service.findByIdAndDelete(id);
+    const setting = await Setting.findByIdAndDelete(id);
 
-    if (!service) {
+    if (!setting) {
       return res.status(404).json({
         code: 404,
         status: 'Not Found',
@@ -144,9 +144,9 @@ const deleteService = async (req, res) => {
 };
 
 module.exports = {
-  indexService,
-  showService,
-  storeService,
-  updateService,
-  deleteService,
+  indexSetting,
+  showSetting,
+  storeSetting,
+  updateSetting,
+  deleteSetting,
 };

@@ -1,5 +1,5 @@
 const Hotel = require('../models/hotel.model');
-const Service = require('../models/service.model');
+const Setting = require('../models/setting.model');
 const Visa = require('../models/visa.model');
 const La = require('../models/la.model');
 const Airline = require('../models/airline.model');
@@ -7,16 +7,16 @@ const { currencyRate } = require('../middlewares/currency.middleware');
 
 const calculate = async (req, res) => {
   try {
-    const { idHotelMakkah, nightInMakkah, idHotelMadinah, nightInMadinah, countVisa, idAirline } = req.body;
+    const { idHotelMakkah, nightInMakkah, idHotelMadinah, nightInMadinah, countVisa, visaPrice, idAirline } = req.body;
     let roomRatesMakkah = [];
     let ratesPerPersonMakkah = [];
     let roomRatesMadinah = [];
     let ratesPerPersonMadinah = [];
     const totalRatesHotelSar = [];
     const totalRatesHotelUsd = [];
-    let usdToSar, usdToIdr, localOffice, feeB2b, feeB2c;
-    const totalRatesServiceUsd = [];
-    const totalRatesServiceIdr = [];
+    const totalRatesSettingUsd = [];
+    const totalRatesSettingIdr = [];
+    let usdToSar, usdToIdr, priceVisa, localOffice, focTl, b2b, b2c;
     const totalNets = [];
     const focUstads = [];
     const focTls = [];
@@ -27,15 +27,15 @@ const calculate = async (req, res) => {
     const fetchCalculate = async () => {
       const makkahPromise = Hotel.findById(idHotelMakkah).lean();
       const madinahPromise = Hotel.findById(idHotelMadinah).lean();
-      const servicePromise = Service.find().lean();
-      const visaPromise = Visa.findOne({ count: countVisa }).lean();
-      const laPromise = La.findOne({ count: countVisa }).lean();
+      const settingPromise = Setting.find().lean();
+      const visaPromise = Visa.findOne({ countVisa: countVisa }).lean();
+      const laPromise = La.findOne({ countLa: countVisa }).lean();
       const airlinePromise = Airline.findById(idAirline).lean();
 
-      return Promise.all([makkahPromise, madinahPromise, servicePromise, visaPromise, laPromise, airlinePromise]);
+      return Promise.all([makkahPromise, madinahPromise, settingPromise, visaPromise, laPromise, airlinePromise]);
     };
 
-    const [hotelMakkah, hotelMadinah, service, visa, la, airline] = await fetchCalculate();
+    const [hotelMakkah, hotelMadinah, setting, visa, la, airline] = await fetchCalculate();
 
     if (!hotelMakkah || !hotelMadinah) {
       return res.status(404).json({
@@ -44,39 +44,55 @@ const calculate = async (req, res) => {
         message: 'Resource not found',
       });
     } else {
-      hotelMakkah.roomPrices.forEach((room) => {
-        const ratePerPersonMakkah = Math.round((room.price * nightInMakkah) / (room.roomType === 'Quad' ? 4 : room.roomType === 'Triple' ? 3 : 2));
-
-        if ((req.body && Array.isArray(req.body.roomRatesMakkah)) || Array.isArray(req.body.ratesPerPersonMakkah)) {
-          roomRatesMakkah = req.body.roomRatesMakkah;
-          ratesPerPersonMakkah = req.body.ratesPerPersonMakkah;
+      hotelMakkah.roomPrices.forEach((hotel) => {
+        if (nightInMakkah === undefined) {
+          return res.status(404).json({
+            code: 400,
+            status: 'Bad Request',
+            message: 'Isi Malam terlebih dahulu',
+          });
         } else {
-          roomRatesMakkah.push({
-            roomType: room.roomType,
-            price: room.price,
-          });
-          ratesPerPersonMakkah.push({
-            roomType: room.roomType,
-            price: ratePerPersonMakkah,
-          });
+          const ratePerPersonMakkah = Math.round((hotel.price * nightInMakkah) / (hotel.roomType === 'Quad' ? 4 : hotel.roomType === 'Triple' ? 3 : 2));
+
+          if ((req.body && Array.isArray(req.body.roomRatesMakkah)) || Array.isArray(req.body.ratesPerPersonMakkah)) {
+            roomRatesMakkah = req.body.roomRatesMakkah;
+            ratesPerPersonMakkah = req.body.ratesPerPersonMakkah;
+          } else {
+            roomRatesMakkah.push({
+              roomType: hotel.roomType,
+              price: hotel.price,
+            });
+            ratesPerPersonMakkah.push({
+              roomType: hotel.roomType,
+              price: ratePerPersonMakkah,
+            });
+          }
         }
       });
 
-      hotelMadinah.roomPrices.forEach((room) => {
-        const ratePerPersonMadinah = Math.round((room.price * nightInMadinah) / (room.roomType === 'Quad' ? 4 : room.roomType === 'Triple' ? 3 : 2));
-
-        if ((req.body && Array.isArray(req.body.roomRatesMadinah)) || Array.isArray(req.body.ratesPerPersonMadinah)) {
-          roomRatesMadinah = req.body.roomRatesMadinah;
-          ratesPerPersonMadinah = req.body.ratesPerPersonMadinah;
+      hotelMadinah.roomPrices.forEach((hotel) => {
+        if (nightInMadinah === undefined) {
+          return res.status(404).json({
+            code: 400,
+            status: 'Bad Request',
+            message: 'Isi Malam terlebih dahulu',
+          });
         } else {
-          roomRatesMadinah.push({
-            roomType: room.roomType,
-            price: room.price,
-          });
-          ratesPerPersonMadinah.push({
-            roomType: room.roomType,
-            price: ratePerPersonMadinah,
-          });
+          const ratePerPersonMadinah = Math.round((hotel.price * nightInMadinah) / (hotel.roomType === 'Quad' ? 4 : hotel.roomType === 'Triple' ? 3 : 2));
+
+          if ((req.body && Array.isArray(req.body.roomRatesMadinah)) || Array.isArray(req.body.ratesPerPersonMadinah)) {
+            roomRatesMadinah = req.body.roomRatesMadinah;
+            ratesPerPersonMadinah = req.body.ratesPerPersonMadinah;
+          } else {
+            roomRatesMadinah.push({
+              roomType: hotel.roomType,
+              price: hotel.price,
+            });
+            ratesPerPersonMadinah.push({
+              roomType: hotel.roomType,
+              price: ratePerPersonMadinah,
+            });
+          }
         }
       });
 
@@ -93,20 +109,26 @@ const calculate = async (req, res) => {
       });
     }
 
-    if (totalRatesHotelSar.length !== 0) {
+    if (totalRatesHotelSar !== 0) {
       const fetchCurrency = async () => {
-        const sarPromise = currencyRate('USD', 'SAR');
         const idrPromise = currencyRate('USD', 'IDR');
+        const sarPromise = currencyRate('USD', 'SAR');
 
         const [sarRate, idrRate] = await Promise.all([sarPromise, idrPromise]);
 
-        if (service !== null) {
-          if (req.body && req.body.usdToSar) {
+        if (setting !== null) {
+          if (req.body && req.body.usdToSar && req.body.usdToIdr) {
             usdToSar = req.body.usdToSar;
             usdToIdr = req.body.usdToIdr;
+          } else if (req.body && req.body.usdToSar) {
+            usdToSar = req.body.usdToSar;
+            usdToIdr = idrRate !== null ? parseFloat(Math.floor(parseFloat(idrRate) * 1000).toFixed(3)) : setting[0].usdToIdr;
+          } else if (req.body && req.body.usdToIdr) {
+            usdToSar = sarRate !== null ? sarRate / 100 : setting[0].usdToSar;
+            usdToIdr = req.body.usdToIdr;
           } else {
-            usdToSar = sarRate !== null ? sarRate / 100 : service[0].usdToSar;
-            usdToIdr = idrRate !== null ? parseFloat(idrRate.toString().replace(/\./g, '')) : service[0].usdToIdr;
+            usdToSar = sarRate !== null ? sarRate / 100 : setting[0].usdToSar;
+            usdToIdr = idrRate !== null ? parseFloat(Math.floor(parseFloat(idrRate) * 1000).toFixed(3)) : setting[0].usdToIdr;
           }
         } else {
           return res.status(404).json({
@@ -129,22 +151,31 @@ const calculate = async (req, res) => {
       });
 
       totalRatesHotelUsd.forEach((total) => {
-        const totalRateServiceUsd = total.price + visa.price + la.price;
-        const totalRateServiceIdr = Math.round(totalRateServiceUsd * usdToIdr);
+        priceVisa = req.body && req.body.visaPrice ? Number(req.body.visaPrice) : Number(visa.visaPrice);
 
-        totalRatesServiceUsd.push({
+        const totalRateSettingUsd = total.price + priceVisa + la.laPrice;
+        const totalRateSettingIdr = Math.round(totalRateSettingUsd * usdToIdr);
+
+        totalRatesSettingUsd.push({
           roomType: total.roomType,
-          price: totalRateServiceUsd,
+          price: totalRateSettingUsd,
         });
-        totalRatesServiceIdr.push({
+        totalRatesSettingIdr.push({
           roomType: total.roomType,
-          price: totalRateServiceIdr,
+          price: totalRateSettingIdr,
         });
       });
 
-      totalRatesServiceIdr.forEach((total) => {
-        const totalNet = total.price + airline.price + service[0].localOffice;
-        localOffice = service[0].localOffice;
+      totalRatesSettingIdr.forEach((total) => {
+        let totalNet = total.price + airline.airlinePrice;
+
+        if (req.body && req.body.localOffice > 0) {
+          totalNet += req.body.localOffice;
+          localOffice = req.body.localOffice;
+        } else {
+          localOffice = setting[0].localOffice;
+          totalNet += setting[0].localOffice;
+        }
 
         totalNets.push({
           roomType: total.roomType,
@@ -153,16 +184,26 @@ const calculate = async (req, res) => {
       });
 
       totalNets.forEach((total) => {
-        const focUstad = Math.round(total.price / (countVisa === 30 ? 30 : countVisa === 20 ? 20 : countVisa === 15 ? 15 : countVisa === 10 ? 10 : 0));
+        const focUstad = Math.round(total.price / (countVisa === '30' ? 30 : countVisa === '20' ? 20 : countVisa === '15' ? 15 : countVisa === '10' ? 10 : 0));
 
         focUstads.push({
           roomType: total.roomType,
           price: focUstad,
         });
-        focTls.push({
-          roomType: total.roomType,
-          price: focUstad,
-        });
+
+        focTl = req.body.focTl;
+
+        if (req.body && focTl === 0) {
+          focTls.push({
+            roomType: total.roomType,
+            price: focTl,
+          });
+        } else {
+          focTls.push({
+            roomType: total.roomType,
+            price: focUstad,
+          });
+        }
       });
 
       totalNets.forEach((total) => {
@@ -208,97 +249,90 @@ const calculate = async (req, res) => {
       });
 
       totalPrices.forEach((total) => {
-        const b2b = Math.round(total.price + service[0].b2b);
-        feeB2b = service[0].b2b;
+        const feeB2b = Math.round(total.price + setting[0].b2b);
 
-        b2bs.push({
-          roomType: total.roomType,
-          price: b2b,
-        });
+        b2b = req.body.b2b;
+
+        if (req.body && b2b > 0) {
+          const finalB2b = Math.round(total.price + b2b);
+
+          b2bs.push({
+            roomType: total.roomType,
+            price: finalB2b,
+          });
+        } else {
+          b2bs.push({
+            roomType: total.roomType,
+            price: feeB2b,
+          });
+
+          b2b = setting[0].b2b;
+        }
       });
 
       b2bs.forEach((b2b) => {
-        const b2c = Math.round(b2b.price + service[0].b2c);
-        feeB2c = service[0].b2c;
+        const feeB2c = Math.round(b2b.price + setting[0].b2c);
+        b2c = req.body.b2c;
 
-        b2cs.push({
-          roomType: b2b.roomType,
-          price: b2c,
-        });
-      });
+        if (req.body && b2c > 0) {
+          const finalB2c = Math.round(b2b.price + b2c);
 
-      console.log({
-        data: {
-          HotelMakkah: hotelMakkah.name,
-          nightInMakkah: nightInMakkah,
-          ratesHotelMakkah: hotelMakkah.roomPrices,
-          ratesPerPersonMakkah: ratesPerPersonMakkah,
-          HotelMadinah: hotelMadinah.name,
-          nightInMadinah: nightInMadinah,
-          ratesHotelMadinah: hotelMadinah.roomPrices,
-          ratesPerPersonMadinah: ratesPerPersonMadinah,
-          totalRatesHotelSar: totalRatesHotelSar,
-          totalRatesHotelUsd: totalRatesHotelUsd,
-          countVisa: countVisa,
-          priceVisa: visa.price,
-          countLa: countVisa,
-          priceLa: la.price,
-          totalRatesServiceUsd: totalRatesServiceUsd,
-          totalRatesServiceIdr: totalRatesServiceIdr,
-          Airline: airline.name,
-          priceAirline: airline.price,
-          localOffice: localOffice,
-          totalNets: totalNets,
-          countFocUstad: countVisa,
-          focUstads: focUstads,
-          countFocTl: countVisa,
-          focTls: focTls,
-          feeB2b: feeB2b,
-          b2bs: b2bs,
-          feeB2c: feeB2c,
-          b2cs: b2cs,
-        },
-      });
+          b2cs.push({
+            roomType: b2b.roomType,
+            price: finalB2c,
+          });
+        } else {
+          b2cs.push({
+            roomType: b2b.roomType,
+            price: feeB2c,
+          });
 
-      res.status(201).json({
-        code: 201,
-        data: {
-          HotelMakkah: hotelMakkah.name,
-          nightInMakkah: nightInMakkah,
-          ratesHotelMakkah: hotelMakkah.roomPrices,
-          ratesPerPersonMakkah: ratesPerPersonMakkah,
-          HotelMadinah: hotelMadinah.name,
-          nightInMadinah: nightInMadinah,
-          ratesHotelMadinah: hotelMadinah.roomPrices,
-          ratesPerPersonMadinah: ratesPerPersonMadinah,
-          totalRatesHotelSar: totalRatesHotelSar,
-          totalRatesHotelUsd: totalRatesHotelUsd,
-          countVisa: countVisa,
-          priceVisa: visa.price,
-          countLa: countVisa,
-          priceLa: la.price,
-          totalRatesServiceUsd: totalRatesServiceUsd,
-          totalRatesServiceIdr: totalRatesServiceIdr,
-          Airline: airline.name,
-          priceAirline: airline.price,
-          localOffice: localOffice,
-          totalNets: totalNets,
-          countFocUstad: countVisa,
-          focUstads: focUstads,
-          countFocTl: countVisa,
-          focTls: focTls,
-          feeB2b: feeB2b,
-          b2bs: b2bs,
-          feeB2c: feeB2c,
-          b2cs: b2cs,
-        },
+          b2c = setting[0].b2c;
+        }
       });
     } else {
-      return res.status(400).json({
+      res.status(400).json({
         code: 400,
         status: 'Bad Request',
+        message: errors.join(', '),
       });
     }
+
+    res.status(201).json({
+      code: 201,
+      status: 'Created',
+      data: {
+        hotelMakkah: hotelMakkah,
+        nightInMakkah: nightInMakkah,
+        ratesHotelMakkah: hotelMakkah.roomPrices,
+        ratesPerPersonMakkah: ratesPerPersonMakkah,
+        hotelMadinah: hotelMadinah,
+        nightInMadinah: nightInMadinah,
+        ratesHotelMadinah: hotelMadinah.roomPrices,
+        ratesPerPersonMadinah: ratesPerPersonMadinah,
+        totalRatesHotelSar: totalRatesHotelSar,
+        totalRatesHotelUsd: totalRatesHotelUsd,
+        countVisa: countVisa,
+        priceVisa: priceVisa,
+        countLa: countVisa,
+        priceLa: la.laPrice,
+        totalRatesSettingUsd: totalRatesSettingUsd,
+        totalRatesSettingIdr: totalRatesSettingIdr,
+        airline: airline.name,
+        codeAirline: airline.code,
+        priceAirline: airline.airlinePrice,
+        localOffice: localOffice,
+        totalNets: totalNets,
+        countFocUstad: countVisa,
+        focUstads: focUstads,
+        countFocTl: countVisa,
+        focTls: focTls,
+        b2b: b2b,
+        b2bs: b2bs,
+        b2c: b2c,
+        b2cs: b2cs,
+      },
+    });
   } catch (error) {
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err) => err.message);
