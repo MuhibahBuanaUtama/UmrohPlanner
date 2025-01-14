@@ -1,0 +1,244 @@
+@font-face {
+  font-family: "Poppins";
+  src: url("/src/assets/font/Poppins.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* body */
+  body {
+    @apply scroll-smooth font-poppins selection:bg-gray-200 selection:text-gray-900 dark:selection:bg-zinc-700 dark:selection:text-gray-200;
+  }
+  /* form */
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
+  /* overflow */
+  .overflow-auto {
+    &::-webkit-scrollbar {
+      width: 0.4em;
+      height: 0.4em;
+    }
+    &::-webkit-scrollbar-track {
+      @apply bg-gray-50 dark:bg-zinc-900;
+    }
+    &::-webkit-scrollbar-thumb {
+      @apply cursor-pointer rounded-full bg-gray-600 hover:bg-opacity-50 dark:bg-zinc-700;
+    }
+  }
+  /* typography */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply text-gray-900 dark:text-gray-200;
+  }
+  p,
+  .small,
+  .extra-small {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+  .priceActive {
+    @apply font-semibold text-gray-900 dark:text-gray-200;
+  }
+  /* input */
+  .input {
+    @apply mt-3 w-full rounded-xl p-4 capitalize text-gray-600 ring-1 ring-gray-200 placeholder:text-gray-200 read-only:cursor-not-allowed read-only:bg-gray-50 focus:ring-green-800 read-only:focus:ring-gray-200 disabled:cursor-not-allowed dark:bg-transparent dark:text-gray-400 dark:ring-zinc-700 dark:placeholder:text-zinc-700 dark:focus:ring-green-800 dark:read-only:focus:ring-zinc-900 dark:disabled:bg-zinc-800 md:p-3;
+  }
+  /* radio */
+  input[type="radio"] {
+    @apply size-3 cursor-pointer appearance-none rounded-full ring-1 ring-gray-200 checked:border-[3px] checked:border-green-800 checked:bg-white checked:ring-green-800 dark:ring-zinc-900 dark:checked:border-green-800 dark:checked:bg-zinc-900 dark:checked:ring-green-800;
+  }
+  input[type="radio"]:disabled {
+    @apply size-3 cursor-not-allowed border-gray-200 bg-gray-50 ring-1 ring-gray-200 dark:border-zinc-900 dark:bg-zinc-700 dark:ring-zinc-900;
+  }
+  /* checkbox */
+  input[type="checkbox"] {
+    @apply size-5 cursor-pointer appearance-none rounded-md ring-1 ring-gray-200 checked:bg-green-800 checked:ring-transparent hover:bg-gray-50 checked:hover:bg-green-700 focus:outline-none dark:ring-zinc-700 dark:checked:ring-transparent dark:hover:bg-zinc-900;
+  }
+  input[type="checkbox"]:checked:before {
+    content: "✓";
+    @apply flex size-5 items-center justify-center rounded-md bg-green-800 text-center text-white;
+  }
+  input[type="checkbox"]:disabled {
+    @apply size-5 cursor-not-allowed border-gray-100 bg-gray-50 dark:border-zinc-700 dark:bg-zinc-900;
+  }
+
+  /* table */
+  table {
+    thead {
+      :nth-child(1) {
+        @apply rounded-s-xl;
+      }
+      :last-child {
+        @apply rounded-e-xl;
+      }
+    }
+    tbody {
+      tr {
+        :last-child {
+          @apply pe-4;
+        }
+        td {
+          @apply p-4;
+        }
+      }
+    }
+  }
+  .table {
+    tbody {
+      tr {
+        td {
+          @apply px-2 py-2;
+        }
+      }
+    }
+  }
+
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 18px;
+    text-align: left;
+  }
+
+  .styled-table thead tr {
+    background-color: #166534;
+    color: #ffffff;
+    text-align: center;
+  }
+
+  .styled-table th,
+  .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+  }
+
+  .styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+  }
+
+  @media print {
+    body {
+      background: white;
+      color: black;
+    }
+
+    .container {
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      -webkit-print-color-adjust: exact; /* Untuk Chrome/Edge */
+      print-color-adjust: exact; /* Untuk Firefox */
+    }
+
+    /* Menghilangkan elemen tertentu saat mencetak, jika perlu */
+    .no-print {
+      display: none;
+    }
+
+    .styled-table th,
+    .styled-table td {
+      font-size: 16px;
+      padding: 10px;
+    }
+
+    .styled-table thead tr {
+      background-color: #166534 !important;
+      color: white !important;
+    }
+  }
+}
+
+@layer components {
+  /* typography */
+  h1 {
+    @apply text-4xl font-bold;
+  }
+  h2 {
+    @apply text-3xl font-bold;
+  }
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+  h4 {
+    @apply text-xl font-semibold;
+  }
+  h5 {
+    @apply text-lg font-medium;
+  }
+  h6 {
+    @apply text-base font-medium;
+  }
+  p {
+    @apply text-base font-normal;
+  }
+  .small {
+    @apply text-sm font-normal;
+  }
+  .extra-small {
+    @apply text-xs font-normal;
+  }
+  /* button */
+  .primary {
+    @apply bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-white dark:hover:bg-green-900 dark:active:bg-green-800;
+  }
+  .secondary {
+    @apply bg-yellow-300 text-gray-900 hover:bg-yellow-200 active:bg-yellow-100;
+  }
+  .tertiary {
+    @apply bg-transparent text-gray-600 ring-1 ring-gray-200 hover:bg-gray-100 active:bg-gray-50 dark:text-gray-400 dark:ring-zinc-700 dark:hover:bg-zinc-700 dark:active:bg-zinc-600;
+  }
+  .quaternary {
+    @apply bg-transparent text-gray-600 hover:text-gray-500 active:text-gray-400 dark:text-gray-400 dark:hover:text-gray-300 dark:active:text-gray-200;
+  }
+  /* badge */
+  .badge-info {
+    @apply bg-blue-500 text-blue-50 dark:bg-blue-900 dark:text-blue-50;
+  }
+  .badge-success {
+    @apply bg-green-500 text-green-50 dark:bg-green-900 dark:text-green-50;
+  }
+  .badge-warning {
+    @apply bg-yellow-500 text-yellow-50 dark:bg-yellow-900 dark:text-yellow-50;
+  }
+  .badge-danger {
+    @apply bg-red-500 text-red-50 dark:bg-red-900 dark:text-red-50;
+  }
+  .badge-basic {
+    @apply bg-gray-200 text-gray-600 dark:bg-zinc-900 dark:text-gray-400;
+  }
+  /* tag */
+  .info {
+    @apply bg-blue-50 text-blue-500 dark:bg-blue-900 dark:text-blue-50;
+  }
+  .success {
+    @apply bg-green-50 text-green-500 dark:bg-green-900 dark:text-green-50;
+  }
+  .warning {
+    @apply bg-yellow-50 text-yellow-500 dark:bg-yellow-900 dark:text-yellow-50;
+  }
+  .danger {
+    @apply bg-red-50 text-red-500 dark:bg-red-900 dark:text-red-50;
+  }
+  .basic {
+    @apply bg-gray-200 text-gray-600 dark:bg-zinc-900 dark:text-gray-400;
+  }
+  .secondary {
+    @apply bg-gray-50 dark:bg-gray-900;
+  }
+}
