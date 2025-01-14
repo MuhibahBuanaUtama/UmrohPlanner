@@ -126,13 +126,13 @@ const calculate = async (req, res) => {
             usdToIdr = req.body.usdToIdr;
           } else if (req.body && req.body.usdToSar) {
             usdToSar = req.body.usdToSar;
-            usdToIdr = idrRate !== null ? finalIdr : setting[0].usdToRupiah;
+            usdToIdr = setting[0].usdToRupiah;
           } else if (req.body && req.body.usdToIdr) {
-            usdToSar = sarRate !== null ? finalSar : setting[0].usdToSar;
+            usdToSar = setting[0].usdToSar;
             usdToIdr = req.body.usdToIdr;
           } else {
-            usdToSar = sarRate !== null ? finalSar : setting[0].usdToSar;
-            usdToIdr = idrRate !== null ? finalIdr : setting[0].usdToRupiah;
+            usdToSar = setting[0].usdToSar;
+            usdToIdr = setting[0].usdToRupiah;
           }
         } else {
           return res.status(404).json({
