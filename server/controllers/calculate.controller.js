@@ -36,6 +36,7 @@ const calculate = async (req, res) => {
     };
 
     const [hotelMakkah, hotelMadinah, setting, visa, la, airline] = await fetchCalculate();
+    console.log('🚀 ~ calculate ~ setting:', setting);
 
     if (!hotelMakkah || !hotelMadinah) {
       return res.status(404).json({
