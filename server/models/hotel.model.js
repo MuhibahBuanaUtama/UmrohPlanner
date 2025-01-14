@@ -2,24 +2,30 @@ const mongoose = require('mongoose');
 
 const hotelSchema = new mongoose.Schema(
   {
+    provider: {
+      type: String,
+      required: [true, 'Provider wajib diisi'],
+    },
+    from: {
+      type: Date,
+      required: [true, 'Tanggal Awal wajib diisi'],
+    },
+    to: {
+      type: Date,
+      required: [true, 'Tanggal Akhir wajib diisi'],
+    },
     name: {
       type: String,
       required: [true, 'Nama Hotel wajib diisi'],
-      unique: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      required: false,
     },
     city: {
       type: String,
       required: [true, 'Kota wajib diisi'],
       enum: ['Makkah', 'Madinah'],
     },
-    location: {
-      type: String,
-      required: [true, 'Lokasi Hotel wajib diisi'],
+    distance: {
+      type: Number,
+      required: [true, 'Jarak wajib diisi'],
     },
     address: {
       type: String,
@@ -30,12 +36,6 @@ const hotelSchema = new mongoose.Schema(
       min: [1, 'Rating minimal 1'],
       max: [5, 'Rating maksimal 5'],
     },
-    amenities: [
-      {
-        type: String,
-        enum: ['Non-smoking rooms', 'Room Service', '2 Restaurants', 'Free Wifi', 'Family Rooms', '24-hour front desk', 'Elevator', 'Air Conditioning', 'Tea/Coffe Maker in All Rooms', 'Breakfast'],
-      },
-    ],
     roomPrices: [
       {
         _id: false,

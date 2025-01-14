@@ -115,6 +115,9 @@ const calculate = async (req, res) => {
         const sarPromise = currencyRate('USD', 'SAR');
 
         const [sarRate, idrRate] = await Promise.all([sarPromise, idrPromise]);
+        const idrPlus = idrRate + 200 / 1000;
+        const finalIdr = parseFloat(idrPlus.toFixed(3).replace('.', ''));
+        const finalSar = sarRate / 100;
 
         if (setting !== null) {
           if (req.body && req.body.usdToSar && req.body.usdToIdr) {
@@ -122,13 +125,13 @@ const calculate = async (req, res) => {
             usdToIdr = req.body.usdToIdr;
           } else if (req.body && req.body.usdToSar) {
             usdToSar = req.body.usdToSar;
-            usdToIdr = idrRate !== null ? parseFloat(Math.floor(parseFloat(idrRate) * 1000).toFixed(3)) : setting[0].usdToIdr;
+            usdToIdr = idrRate !== null ? finalIdr : setting[0].usdToRupiah;
           } else if (req.body && req.body.usdToIdr) {
-            usdToSar = sarRate !== null ? sarRate / 100 : setting[0].usdToSar;
+            usdToSar = sarRate !== null ? finalSar : setting[0].usdToSar;
             usdToIdr = req.body.usdToIdr;
           } else {
-            usdToSar = sarRate !== null ? sarRate / 100 : setting[0].usdToSar;
-            usdToIdr = idrRate !== null ? parseFloat(Math.floor(parseFloat(idrRate) * 1000).toFixed(3)) : setting[0].usdToIdr;
+            usdToSar = sarRate !== null ? finalSar : setting[0].usdToSar;
+            usdToIdr = idrRate !== null ? finalIdr : setting[0].usdToRupiah;
           }
         } else {
           return res.status(404).json({
